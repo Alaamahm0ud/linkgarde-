@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+redis
+torch
+transformers
+aiohttp
+aiofiles
+pyyaml
