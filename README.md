@@ -1,122 +1,140 @@
-🛡️ LINKGARDE — Intelligent Link Threat Analysis Engine
+🔗 LINKGARDE — Intelligent Link Analysis & Threat Detection
 
-Advanced asynchronous system for detecting, analyzing, and classifying malicious links using AI-driven NLP, Vision, and Behavioral analysis.
-
----
+Advanced Link Analysis Framework — integrating multi-layer detection, AI processing, and caching for high-speed, reliable threat scoring.
 
 ⚙️ Overview
 
-LINKGARDE is a modern microservice-based framework built for high-performance link analysis and phishing detection.  
-It integrates asynchronous computation, AI-powered models, and caching mechanisms for real-time, large-scale protection.
+LINKGARDE is a modern, high-performance link analysis system designed for real-time threat detection.
+It combines rule-based, NLP, vision simulation, and dynamic sandboxing analysis into a unified, asynchronous processing pipeline.
 
----
+Core Capabilities
 
-📂 System Architecture
+Rule-based URL analysis (keywords, suspicious domains)
 
-linkgarde/
+NLP semantic understanding for phishing detection (DistilBERT)
+
+Vision-based page analysis (logo and layout validation simulation)
+
+Dynamic sandbox simulation of page behavior
+
+Attacker fingerprinting (domain age, registrar, known threats)
+
+Aggregated threat scoring with caching in Redis
+
+Fully async, parallelized execution for high performance
+
+🧩 System Architecture
+LINKGARDE/
 ├── src/
 │   ├── main.py
 │   ├── initializer.py
-│   ├── rule_engine.py
-│   ├── nlp_processor.py
-│   ├── vision_analyzer.py
-│   ├── sandbox_simulator.py
-│   ├── attacker_fingerprinting.py
-│   ├── threat_scoring.py
-│   ├── result_cache.py
-│   ├── api_gateway.py
-│   └── utils/
-│       └── hashing.py
+│   ├── smartlink_detector.py
+│   ├── services/
+│   │   ├── rule_engine.py
+│   │   ├── nlp_processor.py
+│   │   ├── vision_analyzer.py
+│   │   ├── dynamic_sandbox.py
+│   │   └── attacker_fingerprinting.py
+│   ├── storage/
+│   │   ├── result_cache.py
+│   │   └── threat_scoring_service.py
+│   └── api_gateway.py
 ├── config/
-│   └── settings.yaml
-├── requirements.txt
+│   └── config.yaml
+├── docs/
+│   └── architecture.svg
 └── README.md
 
----
+🧠 Components Breakdown
+⚙️ Component Initializer
 
-🧠 Section Breakdown
+Loads heavy AI models (NLP & Vision) and establishes Redis connections on server startup to optimize performance.
+Class ComponentInitializer executes initialize() at startup_event in FastAPI.
 
-1️⃣ **Core Libraries & Settings**  
-   - **asyncio** for concurrency and non-blocking operations  
-   - **aiohttp / aiofiles** for efficient I/O  
-   - **redis.asyncio** for real-time caching  
-   - **torch / transformers** for NLP & vision models  
-   - **FastAPI** for high-speed API layer  
+🔍 Microservices / Analysis Engines
 
----
+RuleEngine: Fast rule-based URL analysis (keywords, suspicious domains).
 
-2️⃣ **Component Initialization**  
-   Class: `ComponentInitializer`  
-   - Loads all heavy AI models and sets up Redis connection at startup.  
-   - Runs once under the `startup_event` of FastAPI to save runtime resources.
+NLPProcessor: Uses DistilBERT for semantic understanding and phishing detection.
 
----
+VisionAnalyzer: Simulates page layout & logo analysis for visual fraud detection.
 
-3️⃣ **Analysis Microservices**  
-Each class acts as an independent asynchronous engine:  
+DynamicSandbox: Simulates page load & behavior monitoring (redirects, scripts).
 
-- **RuleEngine:** Fast keyword/domain-based analysis.  
-- **NLPProcessor:** Uses *DistilBERT* for semantic understanding and psychological phishing detection.  
-- **VisionAnalyzer:** (Simulated) Detects fake visual elements like forged logos.  
-- **DynamicSandbox:** (Simulated) Observes redirect chains and behavior safely.  
-- **AttackerFingerprinting:** Analyzes domain metadata (age, registrar, reputation).  
+AttackerFingerprinting: Analyzes domain infrastructure, age, registrar, and threat history.
 
----
+🧮 Aggregation & Storage
 
-4️⃣ **Aggregation & Caching Layer**  
-- **ThreatScoringService:** Combines all analysis results into a single threat score and classification.  
-- **ResultCache:** Stores results in Redis using SHA256-based keys for fast retrieval and reusability.
+ThreatScoringService: Combines outputs from all engines, applies weighted scoring, classifies threat levels, and suggests recommendations.
 
----
+ResultCache: Interacts with Redis, caching results for repeated URL requests to reduce computation time.
 
-5️⃣ **Main Orchestration Engine — SmartLinkDetectorPro**  
-Coordinates all modules:  
-- Checks cache  
-- Runs all analyzers asynchronously with `asyncio.gather`  
-- Aggregates and scores results  
-- Caches and returns final report  
+🤖 SmartLinkDetectorPro
 
-This approach ensures near-instant results even under heavy load.
+Coordinates all microservices for each analysis request.
 
----
+Checks cache first; if no result, launches asynchronous tasks for each service using asyncio.gather.
 
-6️⃣ **API Gateway (FastAPI)**  
-Endpoints:  
-- `POST /analyze` — Submit a URL for full analysis  
-- `POST /feedback` — Analysts submit corrections for model retraining  
-- `GET /health` — Simple health status endpoint  
+Aggregates results, calculates threat score, stores in cache, and returns final report.
 
-Startup hook triggers the `initialize()` method once for the environment.
+🌐 API Gateway
 
----
+Built with FastAPI for async performance.
 
-7️⃣ **Runtime Execution**  
+Endpoints:
 
+POST /analyze — submit URL for analysis
 
+POST /feedback — receive analyst corrections (self-improvement loop)
 
----
+GET /health — service health check
 
-🔒 **Security Principles**  
-- Fully ethical and defensive purpose only.  
-- Designed for cybersecurity research and link protection systems.  
-- No active exploitation, payload testing, or unauthorized scanning.  
+Calls initializer.initialize() on startup_event.
 
-License: `Apache-2.0`
+🚀 Running Locally
+uvicorn src.api_gateway:app --reload --host 0.0.0.0 --port 8000
+curl -X POST http://localhost:8000/analyze -H "Content-Type: application/json" -d '{"url":"http://example.com"}'
 
----
+🔒 Security & Reliability
 
-👤 **About the Developer**
+Fully async for high-speed, non-blocking execution
 
-**Alaa Mahmoud Mohamed**  
-Independent Cybersecurity Tools Developer — Creator of *VPN GUARD (SCG)* and *LINKGARDE*  
+Cached results reduce repetitive computations
 
-Location: Giza, Egypt  
-Email: alaat9080@gmail.com  
-Phone: +20 22595905  
-LinkedIn: [linkedin.com/in/alaa-mahmoud-mohamed-918aba378](https://linkedin.com/in/alaa-mahmoud-mohamed-918aba378)  
-GitHub: [github.com/alaat9080-svg/cyber-security-guard-pro](https://github.com/alaat9080-svg/cyber-security-guard-pro)  
+Modular design ensures fault isolation
 
----
+Easily extensible to add new analysis services
 
-🧩 Crafted for precision, speed, and ethical AI-driven link defense.
+📄 License & Ethical Use
 
+Developed strictly for ethical cybersecurity research and defensive purposes.
+Unauthorized penetration or misuse is prohibited.
+
+Recommended License: Apache-2.0 License
+
+🌍 Future Enhancements
+
+Live monitoring dashboard
+
+Dockerized deployment environment
+
+AI-driven anomaly detection improvements
+
+Real-time threat intelligence integration
+
+👤 About the Developer
+
+Alaa Mahmoud Mohamed
+Independent Cybersecurity Tools Developer — Creator of LINKGARDE
+
+Location: Giza, Egypt
+
+Email: alaat9080@gmail.com
+
+Phone: +20 22595905
+
+LinkedIn: linkedin.com/in/alaa-mahmoud-mohamed-918aba378
+
+GitHub: github.com/alaat9080-svg/cyber-security-guard-pro
+
+Crafted with precision, speed, and ethical purpose — for reliable link threat analysis.
